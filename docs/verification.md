@@ -58,6 +58,14 @@ The script will automatically run the Admin API checks instead of skipping them.
 
 `ga4 doctor` also checks this directly from the binary and reports the same enable URL under `checks.admin_api.enable_url`.
 
+If `ga4 doctor` reports `ACCESS_TOKEN_SCOPE_INSUFFICIENT`, run:
+
+```bash
+ga4 auth login
+```
+
+This refreshes the token with the scopes required by Google's generated GA4 Data/Admin clients.
+
 ## Homebrew
 
 ```bash

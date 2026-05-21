@@ -15,7 +15,10 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-const analyticsReadonlyScope = "https://www.googleapis.com/auth/analytics.readonly"
+const (
+	analyticsReadonlyScope = "https://www.googleapis.com/auth/analytics.readonly"
+	analyticsEditScope     = "https://www.googleapis.com/auth/analytics.edit"
+)
 
 type TokenStore struct {
 	PrimaryPath string
@@ -30,7 +33,7 @@ func OAuthConfig(cfg config.Config, redirectURL string) *oauth2.Config {
 		ClientID:     cfg.ClientID,
 		ClientSecret: cfg.ClientSecret,
 		RedirectURL:  redirectURL,
-		Scopes:       []string{analyticsReadonlyScope},
+		Scopes:       []string{analyticsReadonlyScope, analyticsEditScope},
 		Endpoint:     google.Endpoint,
 	}
 }

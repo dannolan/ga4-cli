@@ -8,6 +8,7 @@ import (
 
 	"github.com/dannolan/ga4-cli/internal/config"
 	"github.com/dannolan/ga4-cli/internal/ga4"
+	analyticsadmin "google.golang.org/api/analyticsadmin/v1beta"
 	analyticsdata "google.golang.org/api/analyticsdata/v1beta"
 	"google.golang.org/api/googleapi"
 
@@ -104,11 +105,21 @@ func newDoctorCommand(ctx *appContext) *cobra.Command {
 					addDoctorCheck(checks, "admin_api", false, adminErr, nil)
 					report["ok"] = false
 				} else {
-					_, adminErr = admin.AccountSummaries.List().PageSize(1).Context(cmd.Context()).Do()
+					accountSummaries, adminErr := admin.AccountSummaries.List().PageSize(1).Context(cmd.Context()).Do()
+					if adminErr == nil && len(accountSummaries.AccountSummaries) > 0 {
+						account := accountSummaries.AccountSummaries[0].Account
+						_, adminErr = admin.Accounts.SearchChangeHistoryEvents(account, &analyticsadmin.GoogleAnalyticsAdminV1betaSearchChangeHistoryEventsRequest{
+							PageSize: 1,
+						}).Context(cmd.Context()).Do()
+					}
 					detail := map[string]any{}
 					if serviceDisabled(adminErr) {
 						detail["enable_url"] = "https://console.developers.google.com/apis/api/analyticsadmin.googleapis.com/overview?project=1013065713343"
 						detail["blocked_by"] = "analyticsadmin.googleapis.com is disabled for the OAuth project"
+					}
+					if insufficientScope(adminErr) {
+						detail["blocked_by"] = "OAuth token does not include the Admin API scopes required by Google"
+						detail["fix"] = "Run ga4 auth login to mint a fresh token with analytics.readonly and analytics.edit scopes"
 					}
 					addDoctorCheck(checks, "admin_api", adminErr == nil, adminErr, detail)
 					if adminErr != nil {
@@ -146,10 +157,21 @@ func serviceDisabled(err error) bool {
 	if errors.As(err, &apiErr) {
 		for _, detail := range apiErr.Details {
 			text := strings.ToLower(fmt.Sprint(detail))
-			if strings.Contains(text, "service_disabled") || strings.Contains(text, "analyticsadmin.googleapis.com") {
+			if strings.Contains(text, "service_disabled") {
 				return true
 			}
 		}
 	}
-	return err != nil && strings.Contains(strings.ToLower(err.Error()), "analyticsadmin.googleapis.com")
+	text := strings.ToLower(fmt.Sprint(err))
+	return strings.Contains(text, "service_disabled") || strings.Contains(text, "accessnotconfigured")
+}
+
+func insufficientScope(err error) bool {
+	if err == nil {
+		return false
+	}
+	text := strings.ToLower(err.Error())
+	return strings.Contains(text, "access_token_scope_insufficient") ||
+		strings.Contains(text, "insufficient authentication scopes") ||
+		strings.Contains(text, "insufficient permission")
 }

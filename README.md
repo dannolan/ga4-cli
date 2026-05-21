@@ -56,6 +56,13 @@ ga4 auth login
 ga4 smoke
 ```
 
+`ga4 auth login` asks Google for the scopes used by the official GA4 Data and Admin clients:
+
+- `https://www.googleapis.com/auth/analytics.readonly`
+- `https://www.googleapis.com/auth/analytics.edit`
+
+The CLI only implements read-only Admin operations today, but Google requires the broader Admin scope for some read methods such as change history.
+
 ## Use
 
 Quick checks:
