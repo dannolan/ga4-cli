@@ -56,6 +56,8 @@ scripts/smoke-readonly.sh
 
 The script will automatically run the Admin API checks instead of skipping them.
 
+`ga4 doctor` also checks this directly from the binary and reports the same enable URL under `checks.admin_api.enable_url`.
+
 ## Homebrew
 
 ```bash
@@ -63,6 +65,7 @@ brew audit --strict --online dannolan/tap/ga4-cli
 brew test dannolan/tap/ga4-cli
 brew install dannolan/tap/ga4-cli
 ga4 smoke
+ga4 doctor
 ```
 
 Result: passed.

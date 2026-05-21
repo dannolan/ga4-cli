@@ -61,6 +61,7 @@ ga4 smoke
 Quick checks:
 
 ```bash
+ga4 doctor
 ga4 smoke
 ga4 events --limit 10
 ga4 pages --format csv
@@ -88,6 +89,7 @@ ga4 admin property-resources data-streams list properties/123456789
 ```
 
 Admin commands require `analyticsadmin.googleapis.com` to be enabled on the OAuth project.
+Run `ga4 doctor` if Admin commands fail; it reports the exact Google enablement URL when the service is disabled.
 
 ## Output
 

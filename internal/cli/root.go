@@ -36,6 +36,7 @@ func NewRootCommand() *cobra.Command {
 		newPagesCommand(ctx),
 		newConfigCommand(ctx),
 		newSmokeCommand(ctx),
+		newDoctorCommand(ctx),
 		newVersionCommand(ctx),
 		newManifestCommand(ctx, root),
 	)
