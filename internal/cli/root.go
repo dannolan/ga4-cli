@@ -78,7 +78,7 @@ func newManifestCommand(ctx *appContext, root *cobra.Command) *cobra.Command {
 						"path":     child.CommandPath(),
 						"use":      child.UseLine(),
 						"short":    child.Short,
-						"mutation": false,
+						"mutation": child.Flags().Lookup("apply") != nil || child.InheritedFlags().Lookup("apply") != nil,
 						"flags":    flags,
 					})
 					walk(child)

@@ -114,6 +114,10 @@ func (c *Client) AudienceExportQuery(ctx context.Context, name string, req *anal
 	return c.service.Properties.AudienceExports.Query(name, req).Context(ctx).Do()
 }
 
+func (c *Client) AudienceExportCreate(ctx context.Context, propertyID string, req *analyticsdata.AudienceExport) (*analyticsdata.Operation, error) {
+	return c.service.Properties.AudienceExports.Create(propertyResource(propertyID), req).Context(ctx).Do()
+}
+
 func propertyResource(propertyID string) string {
 	return "properties/" + strings.TrimPrefix(propertyID, "properties/")
 }

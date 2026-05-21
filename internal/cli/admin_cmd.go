@@ -108,6 +108,7 @@ func newAdminAccountsCommand(ctx *appContext) *cobra.Command {
 		},
 	}
 	cmd.AddCommand(list, get, sharing, newAdminAccountAccessReportCommand(ctx), newAdminChangeHistoryCommand(ctx))
+	addAccountMutationCommands(ctx, cmd)
 	return cmd
 }
 
@@ -175,6 +176,7 @@ func newAdminPropertiesCommand(ctx *appContext) *cobra.Command {
 		},
 	}
 	cmd.AddCommand(list, get, retention, newAdminPropertyAccessReportCommand(ctx))
+	addPropertyMutationCommands(ctx, cmd)
 	return cmd
 }
 
@@ -260,17 +262,24 @@ func newAdminChangeHistoryCommand(ctx *appContext) *cobra.Command {
 }
 
 func newAdminPropertyResourcesCommand(ctx *appContext) *cobra.Command {
-	cmd := &cobra.Command{Use: "property-resources", Short: "Read property child resources"}
-	cmd.AddCommand(
-		propertyListGetCommand(ctx, "conversion-events", "conversion event", listConversionEvents, getConversionEvent),
-		propertyListGetCommand(ctx, "custom-dimensions", "custom dimension", listCustomDimensions, getCustomDimension),
-		propertyListGetCommand(ctx, "custom-metrics", "custom metric", listCustomMetrics, getCustomMetric),
-		propertyListGetCommand(ctx, "data-streams", "data stream", listDataStreams, getDataStream),
-		propertyListOnlyCommand(ctx, "firebase-links", "Firebase link", listFirebaseLinks),
-		propertyListOnlyCommand(ctx, "google-ads-links", "Google Ads link", listGoogleAdsLinks),
-		propertyListGetCommand(ctx, "key-events", "key event", listKeyEvents, getKeyEvent),
-		measurementSecretsCommand(ctx),
-	)
+	cmd := &cobra.Command{Use: "property-resources", Short: "Manage property child resources"}
+	conversionEvents := propertyListGetCommand(ctx, "conversion-events", "conversion event", listConversionEvents, getConversionEvent)
+	customDimensions := propertyListGetCommand(ctx, "custom-dimensions", "custom dimension", listCustomDimensions, getCustomDimension)
+	customMetrics := propertyListGetCommand(ctx, "custom-metrics", "custom metric", listCustomMetrics, getCustomMetric)
+	dataStreams := propertyListGetCommand(ctx, "data-streams", "data stream", listDataStreams, getDataStream)
+	firebaseLinks := propertyListOnlyCommand(ctx, "firebase-links", "Firebase link", listFirebaseLinks)
+	googleAdsLinks := propertyListOnlyCommand(ctx, "google-ads-links", "Google Ads link", listGoogleAdsLinks)
+	keyEvents := propertyListGetCommand(ctx, "key-events", "key event", listKeyEvents, getKeyEvent)
+	measurementSecrets := measurementSecretsCommand(ctx)
+	addConversionEventMutationCommands(ctx, conversionEvents)
+	addCustomDimensionMutationCommands(ctx, customDimensions)
+	addCustomMetricMutationCommands(ctx, customMetrics)
+	addDataStreamMutationCommands(ctx, dataStreams)
+	addFirebaseLinkMutationCommands(ctx, firebaseLinks)
+	addGoogleAdsLinkMutationCommands(ctx, googleAdsLinks)
+	addKeyEventMutationCommands(ctx, keyEvents)
+	addMeasurementSecretMutationCommands(ctx, measurementSecrets)
+	cmd.AddCommand(conversionEvents, customDimensions, customMetrics, dataStreams, firebaseLinks, googleAdsLinks, keyEvents, measurementSecrets)
 	return cmd
 }
 

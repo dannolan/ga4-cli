@@ -10,7 +10,7 @@ Tiny, shippable Google Analytics 4 from your terminal.
 - Reuses local Google OAuth credentials.
 - JSON-native command surface for agents.
 - Friendly table/CSV/Markdown output for humans.
-- Read-only by default. Mutating API calls are intentionally left out for now.
+- Mutation-safe by default. Mutating API calls dry-run until you pass `--apply`.
 
 ## Install
 
@@ -61,7 +61,7 @@ ga4 smoke
 - `https://www.googleapis.com/auth/analytics.readonly`
 - `https://www.googleapis.com/auth/analytics.edit`
 
-The CLI only implements read-only Admin operations today, but Google requires the broader Admin scope for some read methods such as change history.
+The CLI can wrap both read-only and mutating Admin operations. Mutations are dry-run by default and require `--apply`; Google still requires the broader Admin scope for some read methods such as change history.
 
 ## Use
 
@@ -97,6 +97,18 @@ ga4 admin property-resources data-streams list properties/123456789
 
 Admin commands require `analyticsadmin.googleapis.com` to be enabled on the OAuth project.
 Run `ga4 doctor` if Admin commands fail; it reports the exact Google enablement URL when the service is disabled.
+
+Mutating calls use the same API-shaped JSON bodies and dry-run by default:
+
+```bash
+printf '%s' '{"displayName":"New Property"}' \
+  | ga4 admin properties create
+
+printf '%s' '{"displayName":"New Property"}' \
+  | ga4 admin properties create --apply
+```
+
+Use `ga4 manifest` to list which commands are mutations.
 
 ## Output
 

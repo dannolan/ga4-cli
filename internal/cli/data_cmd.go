@@ -237,7 +237,7 @@ func newDataBatchPivotsCommand(ctx *appContext) *cobra.Command {
 }
 
 func newDataAudienceExportsCommand(ctx *appContext) *cobra.Command {
-	cmd := &cobra.Command{Use: "audience-exports", Short: "Read GA4 audience exports"}
+	cmd := &cobra.Command{Use: "audience-exports", Short: "Manage GA4 audience exports"}
 	var pageSize int64
 	list := &cobra.Command{
 		Use:   "list",
@@ -297,7 +297,30 @@ func newDataAudienceExportsCommand(ctx *appContext) *cobra.Command {
 	}
 	query.Flags().Int64Var(&limit, "limit", 100, "maximum rows")
 	query.Flags().Int64Var(&offset, "offset", 0, "row offset")
-	cmd.AddCommand(list, get, query)
+	var createOpts mutationOptions
+	create := &cobra.Command{
+		Use:   "create",
+		Short: "Create an audience export from a JSON body",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			property, err := ctx.DefaultProperty()
+			if err != nil {
+				return err
+			}
+			var req analyticsdata.AudienceExport
+			if err := decodeJSONBody(createOpts.Body, &req); err != nil {
+				return err
+			}
+			return runMutation(ctx, createOpts.Apply, "properties.audienceExports.create", propertyResource(property), &req, func() (any, error) {
+				client, err := ctx.Client(cmd.Context())
+				if err != nil {
+					return nil, err
+				}
+				return client.AudienceExportCreate(cmd.Context(), property, &req)
+			})
+		},
+	}
+	addMutationFlags(create, &createOpts)
+	cmd.AddCommand(list, get, query, create)
 	return cmd
 }
 

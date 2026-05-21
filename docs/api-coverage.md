@@ -2,6 +2,8 @@
 
 This CLI targets Google Analytics Data API `v1beta` and Google Analytics Admin API `v1beta` using the official generated Go clients.
 
+Mutating commands are implemented but dry-run by default. They print the request they would send and require `--apply` before calling Google.
+
 ## Data API Read-Only Coverage
 
 Implemented:
@@ -17,9 +19,9 @@ Implemented:
 - `properties.audienceExports.get` via `ga4 data audience-exports get`
 - `properties.audienceExports.query` via `ga4 data audience-exports query`
 
-Not implemented because it creates server-side state:
+Implemented as dry-run/apply mutation:
 
-- `properties.audienceExports.create`
+- `properties.audienceExports.create` via `ga4 data audience-exports create`
 
 ## Admin API Read-Only Coverage
 
@@ -44,7 +46,24 @@ Implemented:
 - `properties.googleAdsLinks.list`
 - `properties.keyEvents.list/get`
 
-Mutating Admin API calls are intentionally excluded for now.
+Implemented as dry-run/apply mutations:
+
+- `accounts.delete`
+- `accounts.patch`
+- `accounts.provisionAccountTicket`
+- `properties.acknowledgeUserDataCollection`
+- `properties.create`
+- `properties.delete`
+- `properties.patch`
+- `properties.updateDataRetentionSettings`
+- `properties.conversionEvents.create/delete/patch`
+- `properties.customDimensions.archive/create/patch`
+- `properties.customMetrics.archive/create/patch`
+- `properties.dataStreams.create/delete/patch`
+- `properties.dataStreams.measurementProtocolSecrets.create/delete/patch`
+- `properties.firebaseLinks.create/delete`
+- `properties.googleAdsLinks.create/delete/patch`
+- `properties.keyEvents.create/delete/patch`
 
 ## Verification
 

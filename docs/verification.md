@@ -66,6 +66,25 @@ ga4 auth login
 
 This refreshes the token with the scopes required by Google's generated GA4 Data/Admin clients.
 
+## Mutation Safety
+
+Mutating Data/Admin API commands are included for API coverage. They are not exercised with `--apply` in automated verification. Dry-run behavior is covered by unit tests and spot checks:
+
+```bash
+ga4 manifest --pretty=false | jq '[.commands[] | select(.mutation==true)] | length'
+printf '%s' '{"displayName":"Dry Run"}' | ga4 admin properties create
+```
+
+Expected dry-run payload:
+
+```json
+{
+  "dry_run": true,
+  "operation": "properties.create",
+  "apply_hint": "pass --apply to call the Google API"
+}
+```
+
 ## Homebrew
 
 ```bash
